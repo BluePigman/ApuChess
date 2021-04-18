@@ -1,2 +1,2 @@
 # Chess
-Play a game of chess ony Python against a bot that plays random moves.
+Play a game of chess on Python against a bot that plays random moves.
