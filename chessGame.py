@@ -133,14 +133,20 @@ def game(): # play game
                         print("Invalid input, should be in format e2e4, " +
                               "for promotions: f7g8q: " + moveInput)
                         continue
-
+                    
                     if not checkInput(moveInput):
-                        print("Invalid characters inputted: " + moveInput)
+                        print("Invalid characters inputted or bad move: "
+                              + moveInput)
                         continue
+                    
+                    if len(moveInput) == 5:
+                        if not checkPromotion(moveInput):
+                            print("Invalid move: " + moveInput)
+                            continue
 
-                    if not checkPromotion(moveInput):
-                        print("Can only promote to b, q, r, k: " + moveInput)
-                        continue
+                    
+
+                    
 
                     move = chess.Move.from_uci(moveInput) # Convert to uci
                     # Check if the move is legal
@@ -200,7 +206,7 @@ def game(): # play game
                         continue
 
                     if not checkPromotion(moveInput):
-                        print("Can only promote to b, q, r, k: " + moveInput)
+                        print("Invalid move: " + moveInput)
                         continue
                     
                     move = chess.Move.from_uci(moveInput) # Convert to uci
@@ -247,11 +253,15 @@ def getRandomMove():
     legal_moves = list(board.legal_moves)
     return random.choice(legal_moves)
 
-def checkInput(move): # Check if a move's squares are on chess board.
-    symbols = "12345678abcdefgh"
-    for c in move: # Loop through the move string
-        if c not in symbols: 
-            return False # If any letter is not in symbols, the move is invalid
+def checkInput(move): # Check if a move makes sense (right format)
+    numbers = "12345678"
+    letters = "abcdefgh"
+    
+    if move[0] not in letters or move[1] not in numbers:
+        return False
+    elif move[2] not in letters or move[3] not in numbers:
+        return False
+    
     return True
 
 def checkPromotion(move): # Check if a promotion move is valid.
