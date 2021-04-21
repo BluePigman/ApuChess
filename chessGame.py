@@ -1,5 +1,5 @@
 """This is a chess game in python, where you play against a computer.
-The computer will play random legal moves, so you likely will beat
+The computer will play random legal moves, so you likely will beat it
 with ease. It will first ask you the side you want to play on,
 then it will start the game. You type moves by typing the piece you
 want to move followed by the square you want to go to (no spaces, no
@@ -8,7 +8,7 @@ you want to promote to at the end (e.g. g7h8q for queen, e2e4).
 The computer will automatically make its move after, and it will print
 the move order every time a move is made. 
 
-April 11, 2021
+April 20, 2021
 @BluePigman
 """
 
@@ -42,6 +42,7 @@ def help(): # Help
     
 def game(): # play game
     userSide = start()
+    userQuit = False
     currentMove = "w"
     computerSide = None
     pgn = ""
@@ -56,7 +57,8 @@ def game(): # play game
 
             if startMove.lower() == "resign":
                 print("You quit FeelsBadMan")
-                quit()
+                userQuit = True
+                break
             if len(startMove) != 4: 
                 print("Invalid input, should be in format e2e4: " + startMove)
                 continue
@@ -67,8 +69,8 @@ def game(): # play game
             move = chess.Move.from_uci(startMove) # Convert to uci
             # Check if the move is legal
             if isLegalMove(move): 
+                pgn += str(moveCount) + "." +  get_san(move) + " "
                 board.push(move)
-                pgn += str(moveCount) + ". " + chess.Move.uci(move) + " " 
                 increment += 1
                 print(pgn + "\n")
                 print(board)
@@ -84,28 +86,36 @@ def game(): # play game
         move = getRandomMove()
         computerSide = "w"
         print("The computer starts with {}".format(move))
-        board.push(move)
-        pgn += str(moveCount) + ". " + chess.Move.uci(move) + " "  
+        pgn += str(moveCount) + "." +  get_san(move) + " "
+        board.push(move) 
         increment += 1
         print(pgn + "\n")
         print(board)
         print()
 
-    while True: # Remaining moves
+    while not userQuit: # Remaining moves
         
         if (board.is_checkmate()): #Check for mate
             result = str(board.outcome());
             winner = result[55:]
             if winner[:len(winner) - 1] == "True":
                 if userSide == "w":
-                    print("Checkmate, you win! PogChamp")
+                    print(board)
+                    print("Checkmate, you win! PogChamp" + "\n")
+                    print("PGN: " + pgn)
                 else:
-                    print("Checkmate, you lose! MaxLOL")
+                    print(board)
+                    print("Checkmate, you lose! MaxLOL" + "\n")
+                    print("PGN: " + pgn)
             else:
                 if userSide == "b":
-                    print("Checkmate, you win! PogChamp")
+                    print(board)
+                    print("Checkmate, you win! PogChamp" + "\n")
+                    print("PGN: " + pgn)
                 else:
-                    print("Checkmate, you lose! MaxLOL")
+                    print(board)
+                    print("Checkmate, you lose! MaxLOL" + "\n")
+                    print("PGN: " + pgn)
             
             break
 
@@ -127,8 +137,10 @@ def game(): # play game
                     print()
                     if moveInput.lower() == "resign":
                         print("You quit FeelsBadMan")
-                        quit()
-                        
+                        userQuit = True
+                        break
+                    
+                    # Check if the move exists.
                     if not(len(moveInput) == 4 or len(moveInput) == 5): 
                         print("Invalid input, should be in format e2e4, " +
                               "for promotions: f7g8q: " + moveInput)
@@ -144,20 +156,17 @@ def game(): # play game
                             print("Invalid move: " + moveInput)
                             continue
 
-                    
-
-                    
-
                     move = chess.Move.from_uci(moveInput) # Convert to uci
                     # Check if the move is legal
                     if isLegalMove(move):
                         
-                        board.push(move)
+                        # (The chess PGN is always 1. Wmove Bmove 2. Wmove ...)
                         if increment % 2 == 0:
                             moveCount += 1
-                            pgn += str(moveCount) + ". " + chess.Move.uci(move) + " " 
+                            pgn += str(moveCount) + "." +  get_san(move) + " " 
                         else:
-                            pgn += chess.Move.uci(move) + " "
+                            pgn += get_san(move) + " "
+                        board.push(move)
                         increment += 1
                         currentMove = "b" #Black plays next move
                         break
@@ -170,12 +179,13 @@ def game(): # play game
             else: # Computer makes their move
                 move = getRandomMove()
                 print("The computer plays {}".format(move) + "\n")
-                board.push(move)
+                
                 if increment % 2 == 0:
                     moveCount += 1
-                    pgn += str(moveCount) + ". " + chess.Move.uci(move) + " " 
+                    pgn += str(moveCount) + "." +  get_san(move) + " " 
                 else:
-                    pgn += chess.Move.uci(move) + " "
+                    pgn += get_san(move) + " "
+                board.push(move)
                 increment += 1
                 print(pgn + "\n")
                 print(board)
@@ -194,7 +204,8 @@ def game(): # play game
                     
                     if moveInput.lower() == "resign":
                         print("You quit FeelsBadMan")
-                        quit()
+                        userQuit = True
+                        break
                         
                     if not(len(moveInput) == 4 or len(moveInput) == 5):
                         print("Invalid input, should be in format e2e4, " +
@@ -213,12 +224,12 @@ def game(): # play game
                     # Check if the move is legal
                     if isLegalMove(move):
                         
-                        board.push(move)
                         if increment % 2 == 0:
                             moveCount += 1
-                            pgn += str(moveCount) + ". " + chess.Move.uci(move) + " "
+                            pgn += str(moveCount) + "." +  get_san(move) + " "
                         else:
-                            pgn += chess.Move.uci(move) + " "
+                            pgn += get_san(move) + " "
+                        board.push(move)
                         increment += 1
                         currentMove = "w" #White plays next move
                         break
@@ -230,18 +241,17 @@ def game(): # play game
             else: # Computer makes their move
                 move = getRandomMove()
                 print("The computer plays {}".format(move) + "\n")
-                board.push(move)
                 if increment % 2 == 0:
                     moveCount += 1
-                    pgn += str(moveCount) + ". " + chess.Move.uci(move) + " "
+                    pgn += str(moveCount) + "." +  get_san(move) + " " 
                 else:
-                    pgn += chess.Move.uci(move) + " "
+                    pgn += get_san(move) + " "
+                board.push(move)
                 increment += 1
                 print(pgn + "\n")
                 print(board)
                 print()
-                currentMove = "w" #White plays next move
-    
+                currentMove = "w" #White plays next move    
         
 def getLegalMoves():
     return list(board.legal_moves)
@@ -267,4 +277,12 @@ def checkInput(move): # Check if a move makes sense (right format)
 def checkPromotion(move): # Check if a promotion move is valid.
     symbols = "bkqr"
     return move[4:] in symbols
+
+"""
+Get standard algebraic notation of move (e2e4 becomes e4).
+move is a uci representation of move.
+"""
+def get_san(move):
+    return board.san(move)
+
 game()
