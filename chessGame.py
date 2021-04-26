@@ -1,4 +1,4 @@
-"""This is a chess game in python, where you play against a computer.
+"""This is a chess game in Python, where you play against a computer.
 The computer will play random legal moves, so you likely will beat it
 with ease. It will first ask you the side you want to play on,
 then it will start the game. You type moves by typing the piece you
